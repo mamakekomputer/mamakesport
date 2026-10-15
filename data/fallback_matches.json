@@ -1,0 +1,121 @@
+[
+  {
+    "id": "LIVE_CH_REDBULL",
+    "title": "Red Bull TV - Saluran Olahraga Ekstrem & Live Sports 24/7",
+    "category": "LIVE TV 24/7",
+    "sport": "Motorsports",
+    "badge": "LIVE 24/7",
+    "start": "2026-10-15T00:00:00+07:00",
+    "poster": "https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?auto=format&fit=crop&w=1200&q=80",
+    "is_live": true,
+    "featured": true,
+    "viewers": 18450,
+    "streams": [
+      {
+        "id": "server1",
+        "title": "Server 1 [Red Bull TV Live HD]",
+        "stream": "https://rbmn-live.akamaized.net/hls/live/590964/BoRB-AT/master.m3u8",
+        "type": "m3u8",
+        "quality": "1080p 60fps"
+      },
+      {
+        "id": "server2",
+        "title": "Server 2 [Mux Sports HD]",
+        "stream": "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8",
+        "type": "m3u8",
+        "quality": "1080p"
+      }
+    ]
+  },
+  {
+    "id": "LIVE_UCL_01",
+    "title": "Real Madrid vs Manchester City - UEFA Champions League",
+    "category": "LIVE EVENT",
+    "sport": "Football",
+    "badge": "LIVE",
+    "start": "2026-10-15T20:00:00+07:00",
+    "poster": "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=1200&q=80",
+    "is_live": true,
+    "featured": true,
+    "viewers": 14250,
+    "streams": [
+      {
+        "id": "server1",
+        "title": "Server 1 [FHD 1080p Live Feed]",
+        "stream": "https://rbmn-live.akamaized.net/hls/live/590964/BoRB-AT/master.m3u8",
+        "type": "m3u8",
+        "quality": "1080p 60fps"
+      },
+      {
+        "id": "server2",
+        "title": "Server 2 [HD 720p]",
+        "stream": "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8",
+        "type": "m3u8",
+        "quality": "720p"
+      },
+      {
+        "id": "server3",
+        "title": "Server 3 [Shaka DASH Demo]",
+        "stream": "https://dash.akamaized.net/akamai/bbb_30fps/bbb_30fps.mpd",
+        "type": "mpd",
+        "quality": "Adaptive DASH"
+      }
+    ]
+  },
+  {
+    "id": "LIVE_MOTOGP_01",
+    "title": "MotoGP Australia 2026 - Phillip Island Qualifying & Sprint Race",
+    "category": "LIVE EVENT",
+    "sport": "Motorsports",
+    "badge": "LIVE",
+    "start": "2026-10-15T13:30:00+07:00",
+    "poster": "https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?auto=format&fit=crop&w=1200&q=80",
+    "is_live": true,
+    "featured": true,
+    "viewers": 8940,
+    "streams": [
+      {
+        "id": "server1",
+        "title": "Server 1 [Main Feed HD]",
+        "stream": "https://rbmn-live.akamaized.net/hls/live/590964/BoRB-AT/master.m3u8",
+        "type": "m3u8",
+        "quality": "1080p"
+      },
+      {
+        "id": "server2",
+        "title": "Server 2 [Onboard Cam]",
+        "stream": "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8",
+        "type": "m3u8",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "id": "LIVE_BWF_01",
+    "title": "Jonatan Christie vs Viktor Axelsen - Denmark Open 2026 Quarter Final",
+    "category": "LIVE EVENT",
+    "sport": "Badminton",
+    "badge": "LIVE",
+    "start": "2026-10-15T14:15:00+07:00",
+    "poster": "https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?auto=format&fit=crop&w=1200&q=80",
+    "is_live": true,
+    "featured": true,
+    "viewers": 11320,
+    "streams": [
+      {
+        "id": "court1",
+        "title": "Court 1 [TV Feed]",
+        "stream": "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8",
+        "type": "m3u8",
+        "quality": "1080p 50fps"
+      },
+      {
+        "id": "court2",
+        "title": "Court 2 [Backup]",
+        "stream": "https://rbmn-live.akamaized.net/hls/live/590964/BoRB-AT/master.m3u8",
+        "type": "m3u8",
+        "quality": "720p"
+      }
+    ]
+  }
+]
