@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="referrer" content="no-referrer">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Watch Live Streaming - MamakeSport</title>
+
+  <!-- Tailwind CSS & FontAwesome -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <!-- Shaka Player CDN (Official Google Shaka UI) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/shaka-player@4.16.2/dist/controls.css">
+  <script src="https://cdn.jsdelivr.net/npm/shaka-player@4.16.2/dist/shaka-player.ui.js"></script>
+
+  <!-- Hls.js fallback -->
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="/css/style.css">
+  
+  <style>
+    .ambient-glow-active {
+      box-shadow: 0 0 60px rgba(217, 255, 0, 0.25), 0 0 100px rgba(217, 255, 0, 0.15) !important;
+    }
+  </style>
+</head>
+<body class="bg-[#09090b] text-gray-100 min-h-screen">
+
+  <!-- Header -->
+  <header class="sticky top-0 z-50 glass-header px-4 py-3">
+    <div class="max-w-[1440px] mx-auto flex items-center justify-between gap-4">
+      <a href="/" class="flex items-center gap-2 group">
+        <div class="w-9 h-9 rounded-xl bg-[#d9ff00] flex items-center justify-center text-black font-black text-lg">
+          ⚡
+        </div>
+        <span class="text-xl font-black text-white group-hover:text-[#d9ff00] transition-colors">MAMAKE<span class="text-[#d9ff00]">SPORT</span></span>
+      </a>
+
+      <div class="flex items-center gap-3">
+        <a href="/" class="flex items-center gap-2 text-xs font-bold text-zinc-300 hover:text-white bg-zinc-900 border border-zinc-700 hover:border-[#d9ff00] px-3.5 py-2 rounded-xl transition-all">
+          <i class="fa-solid fa-arrow-left"></i>
+          <span>Kembali ke Jadwal</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Watch Content -->
+  <main class="max-w-[1440px] mx-auto px-4 pt-4 pb-20">
+
+    <!-- Match Header & Info -->
+    <div class="mb-4">
+      <div class="flex items-center gap-2 flex-wrap mb-2">
+        <span id="matchCategoryBadge" class="bg-zinc-800 text-zinc-300 text-xs font-extrabold px-3 py-1 rounded-full border border-zinc-700">
+          LIVE SPORTS
+        </span>
+        <span id="matchSportBadge" class="bg-[#d9ff00]/10 text-[#d9ff00] text-xs font-extrabold px-2.5 py-1 rounded-full border border-[#d9ff00]/30">
+          Sport
+        </span>
+        <span class="flex items-center gap-1.5 text-xs text-zinc-400 bg-zinc-900 px-3 py-1 rounded-full border border-zinc-800">
+          <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+          <span id="viewerCountNumber">1,250</span> penonton online
+        </span>
+      </div>
+
+      <h1 id="matchTitle" class="text-lg sm:text-2xl md:text-3xl font-black text-white leading-tight">
+        Memuat pertandingan...
+      </h1>
+
+      <div class="flex items-center gap-3 text-xs text-zinc-400 mt-2">
+        <span id="matchStartTime"><i class="fa-regular fa-clock mr-1 text-[#d9ff00]"></i> Menghubungkan ke jadwal...</span>
+        <span>•</span>
+        <span><i class="fa-solid fa-shield-halved text-emerald-400 mr-1"></i> Jalur Streaming Terenkripsi</span>
+      </div>
+    </div>
+
+    <!-- Multi-Server / Court Switcher Bar -->
+    <div id="courtSwitcher" class="glass-card p-3 rounded-xl mb-4 flex items-center justify-between flex-wrap gap-2">
+      <!-- Populated dynamically by player.js -->
+    </div>
+
+    <!-- Demo Stream Alert Banner (if activated) -->
+    <div id="demoStreamAlert" class="hidden mb-4 p-3 bg-amber-500/10 border border-amber-500/30 rounded-xl text-xs text-amber-200 flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <i class="fa-solid fa-triangle-exclamation text-amber-400 text-sm"></i>
+        <span>Mode Pratinjau Video Aktif: Pertandingan resmi dari apemtipi belum kick-off. Video ini adalah uji coba kualitas player.</span>
+      </div>
+      <button onclick="document.getElementById('demoStreamAlert').classList.add('hidden')" class="text-zinc-400 hover:text-white">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <!-- Main Grid: Video Player (Left) + Interactive Live Chat / Info (Right) -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+      <!-- Video Player Column (8 cols on desktop) -->
+      <div class="lg:col-span-8 flex flex-col gap-4">
+        
+        <!-- Player Wrapper -->
+        <div id="playerWrapper" class="player-container relative">
+          
+          <div id="shakaContainer" class="w-full h-full relative" data-shaka-player-container>
+            
+            <!-- Shaka / Native Video Element -->
+            <video 
+              id="shakaVideo" 
+              class="w-full h-full object-contain" 
+              autoplay 
+              playsinline 
+              data-shaka-player
+            ></video>
+
+            <!-- External Iframe Embed Support -->
+            <iframe 
+              id="streamFrame" 
+              class="w-full h-full border-0 hidden" 
+              allowfullscreen 
+              allow="autoplay; encrypted-media; picture-in-picture"
+            ></iframe>
+
+            <!-- Fallback Poster Container -->
+            <div id="playerPosterContainer" class="absolute inset-0 z-10 flex items-center justify-center bg-black">
+              <img id="playerPosterFallback" src="" alt="Poster" class="w-full h-full object-cover opacity-40">
+              <div class="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent"></div>
+            </div>
+
+            <!-- Pre-Match Countdown Overlay Modal -->
+            <div id="countdownOverlay" class="absolute inset-0 z-20 flex flex-col items-center justify-center bg-black/85 backdrop-blur-md p-6 text-center">
+              <div class="w-12 h-12 rounded-full bg-[#d9ff00]/20 border border-[#d9ff00] flex items-center justify-center text-[#d9ff00] text-xl mb-3 animate-bounce">
+                <i class="fa-solid fa-stopwatch"></i>
+              </div>
+              <h3 class="text-lg md:text-xl font-black text-white mb-1">Pertandingan Belum Dimulai</h3>
+              <p id="countdownNotice" class="text-xs text-zinc-300 mb-6 max-w-md leading-relaxed">
+                Server apemtipi menyiarkan link live resmi 15–30 menit menjelang kick-off. Anda bisa memutar siaran live olahraga 24/7 di bawah ini tanpa menunggu.
+              </p>
+
+              <!-- Countdown Box -->
+              <div class="flex items-center gap-3 mb-6">
+                <div class="bg-zinc-900 border border-zinc-700 px-4 py-3 rounded-xl min-w-[70px]">
+                  <span id="countHours" class="text-2xl md:text-3xl font-black text-white">00</span>
+                  <span class="block text-[10px] text-zinc-400 uppercase font-bold mt-1">Jam</span>
+                </div>
+                <span class="text-xl font-black text-[#d9ff00]">:</span>
+                <div class="bg-zinc-900 border border-zinc-700 px-4 py-3 rounded-xl min-w-[70px]">
+                  <span id="countMinutes" class="text-2xl md:text-3xl font-black text-white">00</span>
+                  <span class="block text-[10px] text-zinc-400 uppercase font-bold mt-1">Menit</span>
+                </div>
+                <span class="text-xl font-black text-[#d9ff00]">:</span>
+                <div class="bg-zinc-900 border border-zinc-700 px-4 py-3 rounded-xl min-w-[70px]">
+                  <span id="countSeconds" class="text-2xl md:text-3xl font-black text-[#d9ff00]">00</span>
+                  <span class="block text-[10px] text-zinc-400 uppercase font-bold mt-1">Detik</span>
+                </div>
+              </div>
+
+              <!-- Action Buttons -->
+              <div class="flex items-center gap-3 flex-wrap justify-center">
+                <button onclick="play247LiveStream()" class="btn-neon px-5 py-2.5 rounded-xl text-xs md:text-sm font-bold flex items-center gap-2 shadow-lg">
+                  <i class="fa-solid fa-satellite-dish text-red-600 animate-pulse"></i> Tonton Siaran Olahraga Live 24/7 Sekarang
+                </button>
+                <button onclick="playDemoStream()" class="bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border border-zinc-600 px-4 py-2.5 rounded-xl text-xs font-bold flex items-center gap-2">
+                  <i class="fa-solid fa-play"></i> Tes Server HD
+                </button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Player Controls & Quality Bar -->
+        <div class="glass-card p-3 rounded-xl flex items-center justify-between text-xs text-zinc-400">
+          <div class="flex items-center gap-3">
+            <button id="btnAmbient" class="hover:text-white flex items-center gap-1.5 font-semibold transition-colors" title="Toggle Ambient Glow Effect">
+              <i class="fa-solid fa-lightbulb"></i> Ambient Glow
+            </button>
+            <span class="text-zinc-700">|</span>
+            <button id="btnPip" class="hover:text-white flex items-center gap-1.5 font-semibold transition-colors" title="Picture in Picture Mode">
+              <i class="fa-solid fa-clone"></i> PiP Mini Player
+            </button>
+          </div>
+
+          <div class="flex items-center gap-3">
+            <span class="text-emerald-400 font-bold flex items-center gap-1">
+              <span class="w-2 h-2 rounded-full bg-emerald-400"></span> Ultra HD 1080p
+            </span>
+            <button id="btnFullscreen" class="hover:text-white flex items-center gap-1.5 font-semibold transition-colors">
+              <i class="fa-solid fa-expand"></i> Layar Penuh
+            </button>
+          </div>
+        </div>
+
+        <!-- Tips & Streaming Info -->
+        <div class="glass-card p-4 rounded-xl text-xs space-y-2">
+          <h4 class="font-bold text-white flex items-center gap-2 text-sm">
+            <i class="fa-solid fa-circle-question text-[#d9ff00]"></i> Tips Menonton Bebas Kendala:
+          </h4>
+          <ul class="list-disc list-inside space-y-1 text-zinc-400">
+            <li>Jika stream buffering atau macet, silakan beralih ke tombol <strong>Server 2</strong> atau <strong>Server 3</strong> di bagian atas pemutar.</li>
+            <li>Jadwal dan stream diperbarui secara otomatis setiap beberapa detik dari sumber <strong>apemtipi.online</strong>.</li>
+            <li>Gunakan browser Google Chrome, Microsoft Edge, atau Safari untuk performa akselerasi hardware maksimal.</li>
+          </ul>
+        </div>
+
+      </div>
+
+      <!-- Right Column: Live Chat & Related Schedule (4 cols on desktop) -->
+      <div class="lg:col-span-4 flex flex-col gap-4">
+        
+        <!-- Interactive Live Chat -->
+        <div class="glass-card rounded-xl overflow-hidden flex flex-col h-[520px]">
+          <!-- Chat Header -->
+          <div class="px-4 py-3 border-b border-zinc-800 bg-zinc-900/80 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <i class="fa-solid fa-comments text-[#d9ff00]"></i>
+              <span class="text-xs font-bold text-white">Live Chat Komunitas</span>
+            </div>
+            <span class="text-[10px] text-zinc-400 bg-zinc-800 px-2 py-0.5 rounded-full border border-zinc-700">
+              Real-time
+            </span>
+          </div>
+
+          <!-- Chat Messages Body -->
+          <div id="chatMessages" class="flex-1 p-3 overflow-y-auto space-y-2">
+            <!-- Messages injected dynamically -->
+          </div>
+
+          <!-- Chat Input Form -->
+          <form id="chatForm" class="p-3 border-t border-zinc-800 bg-zinc-900/60 flex items-center gap-2">
+            <input 
+              id="chatInput" 
+              type="text" 
+              placeholder="Tulis komentar atau reaksi..." 
+              maxlength="150"
+              class="flex-1 bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-[#d9ff00]"
+            >
+            <button type="submit" class="bg-[#d9ff00] hover:bg-[#e5ff33] text-black font-black p-2 rounded-lg text-xs transition-colors flex items-center justify-center">
+              <i class="fa-solid fa-paper-plane"></i>
+            </button>
+          </form>
+        </div>
+
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- Scripts -->
+  <script src="/js/player.js"></script>
+</body>
+</html>
