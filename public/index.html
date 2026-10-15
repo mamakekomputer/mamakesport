@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MamakeSport - Jadwal & Live Streaming Olahraga Terintegrasi</title>
+  
+  <meta name="description" content="Tonton live streaming olahraga terlengkap (Sepak Bola, MotoGP, Voli, Badminton, Basket, UFC) terintegrasi dengan jadwal apemtipi.online">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+  
+  <!-- Tailwind CSS & FontAwesome -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="bg-[#09090b] text-gray-100 min-h-screen">
+
+  <!-- Header / Navigation Bar -->
+  <header class="sticky top-0 z-50 glass-header px-4 py-3">
+    <div class="max-w-[1440px] mx-auto flex items-center justify-between gap-4">
+      
+      <!-- Brand Logo -->
+      <a href="/" class="flex items-center gap-2 text-decoration-none group">
+        <div class="w-10 h-10 rounded-xl bg-[#d9ff00] flex items-center justify-center text-black font-black text-xl shadow-lg shadow-[#d9ff00]/20 group-hover:scale-105 transition-transform">
+          ⚡
+        </div>
+        <div>
+          <span class="text-xl font-black tracking-tight text-white group-hover:text-[#d9ff00] transition-colors">MAMAKE<span class="text-[#d9ff00]">SPORT</span></span>
+          <span class="hidden sm:inline-block text-[10px] font-bold text-zinc-400 bg-zinc-800/80 px-2 py-0.5 rounded-full ml-1.5 border border-zinc-700">
+            Apemtipi Sync
+          </span>
+        </div>
+      </a>
+
+      <!-- Desktop Search Bar -->
+      <div id="searchBox" class="relative hidden md:block w-full max-w-md">
+        <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-500 text-sm"></i>
+        <input 
+          id="searchInput" 
+          type="text" 
+          placeholder="Cari tim, pertandingan, atau liga..." 
+          class="w-full bg-zinc-900/90 border border-zinc-800 rounded-xl pl-10 pr-4 py-2 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-[#d9ff00] focus:ring-1 focus:ring-[#d9ff00] transition-all"
+        >
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex items-center gap-2">
+        <!-- Sync Apemtipi Button -->
+        <button id="btnSyncData" class="flex items-center gap-2 bg-zinc-900 hover:bg-zinc-800 text-zinc-200 border border-zinc-700 hover:border-[#d9ff00] px-3.5 py-2 rounded-xl text-xs font-bold transition-all shadow-sm">
+          <i class="fa-solid fa-rotate text-[#d9ff00]"></i>
+          <span class="hidden sm:inline">Sinkron Jadwal</span>
+        </button>
+
+        <!-- Admin / Add Stream -->
+        <a href="/admin" class="flex items-center gap-2 bg-zinc-800/80 hover:bg-zinc-700 text-white border border-zinc-700 px-3.5 py-2 rounded-xl text-xs font-bold transition-all">
+          <i class="fa-solid fa-sliders text-[#d9ff00]"></i>
+          <span class="hidden sm:inline">Kelola Stream</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Mobile Search Bar -->
+    <div class="md:hidden mt-2 pt-2 border-t border-zinc-800/60">
+      <div class="relative w-full">
+        <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 text-xs"></i>
+        <input 
+          id="searchInputMobile" 
+          type="text" 
+          placeholder="Cari pertandingan..." 
+          class="w-full bg-zinc-900 border border-zinc-800 rounded-lg pl-9 pr-3 py-1.5 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-[#d9ff00]"
+        >
+      </div>
+    </div>
+  </header>
+
+  <!-- Live Search Overlay Dropdown -->
+  <div id="searchOverlay" class="hidden fixed top-[60px] md:top-[68px] left-1/2 -translate-x-1/2 w-[95%] max-w-xl z-[9999]">
+    <div class="bg-[#111115] border border-zinc-700 rounded-2xl shadow-2xl overflow-hidden backdrop-blur-xl">
+      <div id="searchResults" class="max-h-[380px] overflow-y-auto divide-y divide-zinc-800">
+        <!-- Populated dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Announcement Ticker -->
+  <div class="max-w-[1440px] mx-auto px-4 mt-3">
+    <div class="ticker-wrap flex items-center">
+      <div class="flex-shrink-0 bg-[#d9ff00] text-black text-[10px] font-black uppercase px-2.5 py-1 rounded ml-2 mr-3 flex items-center gap-1.5">
+        <i class="fa-solid fa-bullhorn"></i> INFO LIVE
+      </div>
+      <div class="ticker-content text-xs text-zinc-300">
+        <span class="mr-8">🏆 Selamat datang di <strong>MamakeSport</strong> - Web Streaming & Jadwal Olahraga terintegrasi langsung dengan apemtipi.online!</span>
+        <span class="mr-8">⚡ Nikmati streaming multi-server HD tanpa buffering. Pilih Server 1, Server 2, atau Court Switcher saat pertandingan live.</span>
+        <span class="mr-8">📢 Klik tombol <strong>Sinkron Jadwal</strong> kapan saja untuk mengambil pembaruan jadwal dan link terbaru langsung dari apemtipi.online.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content Container -->
+  <main class="max-w-[1440px] mx-auto px-4 pt-4 pb-24">
+
+    <!-- Hero Featured Carousel -->
+    <section class="mb-8" id="heroCarouselSection">
+      <div id="heroContainer">
+        <!-- Rendered by main.js -->
+        <div class="w-full aspect-[21/9] min-h-[300px] bg-zinc-900/60 rounded-2xl animate-pulse"></div>
+      </div>
+    </section>
+
+    <!-- Status & Filter Toolbar -->
+    <section class="mb-8">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
+        <div>
+          <h2 class="text-xl md:text-2xl font-black text-white tracking-tight flex items-center gap-2">
+            <span>Jadwal & Live Pertandingan</span>
+            <span id="totalMatchCount" class="text-xs font-bold text-[#d9ff00] bg-[#d9ff00]/10 border border-[#d9ff00]/30 px-2.5 py-0.5 rounded-full">
+              Memuat...
+            </span>
+          </h2>
+          <p id="lastSyncTime" class="text-xs text-zinc-500 mt-0.5">Sinkronisasi otomatis dengan apemtipi.online</p>
+        </div>
+      </div>
+
+      <!-- Category Filter Pills -->
+      <div id="filterPills" class="flex items-center gap-2 overflow-x-auto pb-2 hide-scrollbar">
+        <!-- Filter buttons rendered by main.js -->
+      </div>
+    </section>
+
+    <!-- Main Loader -->
+    <div id="mainLoader" class="text-center py-20">
+      <div class="w-12 h-12 border-4 border-zinc-700 border-t-[#d9ff00] rounded-full animate-spin mx-auto mb-4"></div>
+      <p class="text-sm font-semibold text-zinc-400">Sedang mengambil jadwal pertandingan dari apemtipi.online...</p>
+    </div>
+
+    <!-- Sections Container -->
+    <div id="sectionsContainer">
+      <!-- Generated dynamically by main.js -->
+    </div>
+
+  </main>
+
+  <!-- Floating Action Buttons -->
+  <a href="https://wa.me/" target="_blank" rel="noopener noreferrer" class="floating-btn wa-btn" title="Komunitas WhatsApp" aria-label="WhatsApp">
+    <i class="fa-brands fa-whatsapp text-2xl"></i>
+  </a>
+
+  <a href="#" id="upFloat" class="floating-btn up-btn" title="Kembali ke atas" aria-label="Kembali ke atas">
+    <i class="fa-solid fa-chevron-up text-lg"></i>
+  </a>
+
+  <!-- Footer -->
+  <footer class="border-t border-zinc-800/80 bg-zinc-950/80 py-8 px-4 text-center text-xs text-zinc-500">
+    <div class="max-w-[1440px] mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+      <div class="flex items-center gap-2">
+        <span class="font-extrabold text-white">MAMAKE<span class="text-[#d9ff00]">SPORT</span></span>
+        <span>•</span>
+        <span>Streaming & Jadwal Pertandingan Real-time</span>
+      </div>
+      <div>
+        <span>Terintegrasi dan bersumber dari </span>
+        <a href="https://apemtipi.online/" target="_blank" rel="noopener" class="text-[#d9ff00] hover:underline font-semibold">apemtipi.online</a>
+      </div>
+      <div class="flex items-center gap-4 text-zinc-400">
+        <a href="/" class="hover:text-white">Beranda</a>
+        <a href="/admin" class="hover:text-white">Kelola Stream</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="/js/main.js"></script>
+</body>
+</html>
