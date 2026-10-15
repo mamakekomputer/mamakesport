@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kelola Stream & Sinkronisasi Jadwal - MamakeSport</title>
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="bg-[#09090b] text-gray-100 min-h-screen">
+
+  <header class="sticky top-0 z-50 glass-header px-4 py-3">
+    <div class="max-w-[1440px] mx-auto flex items-center justify-between">
+      <a href="/" class="flex items-center gap-2">
+        <div class="w-9 h-9 rounded-xl bg-[#d9ff00] flex items-center justify-center text-black font-black text-lg">⚡</div>
+        <span class="text-xl font-black text-white">MAMAKE<span class="text-[#d9ff00]">SPORT</span></span>
+        <span class="text-xs bg-zinc-800 text-zinc-400 px-2 py-0.5 rounded font-mono ml-2">Admin / Panel</span>
+      </a>
+
+      <a href="/" class="text-xs font-bold bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-white px-3 py-1.5 rounded-lg flex items-center gap-2">
+        <i class="fa-solid fa-arrow-left"></i> Kembali ke Beranda
+      </a>
+    </div>
+  </header>
+
+  <main class="max-w-[1100px] mx-auto px-4 py-8 space-y-8">
+
+    <!-- Sync with Apemtipi Card -->
+    <div class="glass-card p-6 rounded-2xl border border-zinc-800">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h2 class="text-lg font-black text-white flex items-center gap-2">
+            <i class="fa-solid fa-cloud-arrow-down text-[#d9ff00]"></i>
+            Sinkronisasi Data Apemtipi
+          </h2>
+          <p class="text-xs text-zinc-400 mt-1 max-w-xl">
+            Sistem MamakeSport secara otomatis mengambil dan menyegarkan jadwal pertandingan serta link server dari <strong>https://apemtipi.online/</strong>. Anda juga bisa memicu sinkronisasi manual sekarang.
+          </p>
+        </div>
+
+        <button id="btnManualSync" class="btn-neon px-5 py-2.5 rounded-xl text-xs md:text-sm font-bold flex items-center gap-2 flex-shrink-0">
+          <i class="fa-solid fa-rotate"></i> Sinkron Sekarang
+        </button>
+      </div>
+
+      <div id="syncStatusBox" class="mt-4 p-3 bg-zinc-900/80 rounded-xl text-xs text-zinc-400 border border-zinc-800 hidden">
+        <!-- Status message -->
+      </div>
+    </div>
+
+    <!-- Add Custom Match / Stream Form -->
+    <div class="glass-card p-6 rounded-2xl border border-zinc-800">
+      <h2 class="text-lg font-black text-white flex items-center gap-2 mb-4">
+        <i class="fa-solid fa-plus-circle text-[#d9ff00]"></i>
+        Tambah Pertandingan / Stream Kustom
+      </h2>
+
+      <form id="addMatchForm" class="space-y-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-bold text-zinc-300 mb-1">Judul Pertandingan *</label>
+            <input 
+              type="text" 
+              id="matchTitleInput" 
+              required
+              placeholder="Contoh: Arsenal vs Chelsea - Premier League" 
+              class="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-[#d9ff00]"
+            >
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-zinc-300 mb-1">Kategori / Liga</label>
+            <input 
+              type="text" 
+              id="matchCategoryInput" 
+              placeholder="Contoh: FOOTBALL / PREMIER LEAGUE" 
+              class="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-[#d9ff00]"
+            >
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <label class="block text-xs font-bold text-zinc-300 mb-1">Jenis Olahraga</label>
+            <select id="matchSportInput" class="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-[#d9ff00]">
+              <option value="Football">Sepak Bola</option>
+              <option value="Motorsports">Motorsports (MotoGP/F1)</option>
+              <option value="Volleyball">Bola Voli</option>
+              <option value="Badminton">Badminton</option>
+              <option value="Basketball">Basket</option>
+              <option value="Fight Sports">Fight Sports (UFC/Tinju)</option>
+              <option value="Tennis">Tenis</option>
+              <option value="Baseball">Baseball</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-zinc-300 mb-1">Format Stream</label>
+            <select id="streamTypeInput" class="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-[#d9ff00]">
+              <option value="m3u8">HLS (.m3u8)</option>
+              <option value="mpd">MPEG-DASH (.mpd)</option>
+              <option value="iframe">Embed Web / Iframe</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-zinc-300 mb-1">Status Siaran</label>
+            <div class="flex items-center gap-3 mt-2">
+              <label class="flex items-center gap-2 text-xs cursor-pointer">
+                <input type="checkbox" id="isLiveCheckbox" checked class="accent-[#d9ff00] w-4 h-4">
+                <span class="text-white font-semibold">Tandai Sedang LIVE</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-zinc-300 mb-1">URL Stream Video (.m3u8 / .mpd / Embed Link) *</label>
+          <input 
+            type="url" 
+            id="streamUrlInput" 
+            required
+            placeholder="https://domain.com/live/stream.m3u8" 
+            class="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-[#d9ff00]"
+          >
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-zinc-300 mb-1">URL Poster / Banner Thumbnail (Opsional)</label>
+          <input 
+            type="url" 
+            id="posterUrlInput" 
+            placeholder="https://images.unsplash.com/... atau kosongkan untuk default" 
+            class="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-[#d9ff00]"
+          >
+        </div>
+
+        <button type="submit" class="btn-neon px-6 py-2.5 rounded-xl text-xs font-bold flex items-center gap-2">
+          <i class="fa-solid fa-plus"></i> Simpan & Publikasikan Pertandingan
+        </button>
+      </form>
+    </div>
+
+    <!-- Quick Stream Tester Modal / Box -->
+    <div class="glass-card p-6 rounded-2xl border border-zinc-800">
+      <h2 class="text-lg font-black text-white flex items-center gap-2 mb-2">
+        <i class="fa-solid fa-play text-[#d9ff00]"></i>
+        Uji Coba Stream Video Langsung
+      </h2>
+      <p class="text-xs text-zinc-400 mb-4">
+        Masukkan URL video streaming (.m3u8 atau .mpd) untuk langsung mengujinya dengan Shaka Player di peramban Anda.
+      </p>
+
+      <div class="flex items-center gap-2">
+        <input 
+          type="text" 
+          id="quickTestUrl" 
+          placeholder="https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8" 
+          value="https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8"
+          class="flex-1 bg-zinc-900 border border-zinc-800 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-[#d9ff00]"
+        >
+        <button onclick="testQuickStream()" class="bg-zinc-800 hover:bg-zinc-700 text-white px-4 py-2 rounded-xl text-xs font-bold border border-zinc-700">
+          Uji Putar
+        </button>
+      </div>
+
+      <div id="testPlayerBox" class="mt-4 hidden">
+        <div class="aspect-video w-full max-w-xl mx-auto bg-black rounded-xl overflow-hidden border border-zinc-800">
+          <video id="testVideo" controls autoplay class="w-full h-full object-contain"></video>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Hls.js for quick testing -->
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+  
+  <script>
+    // Manual sync button
+    document.getElementById('btnManualSync').addEventListener('click', async () => {
+      const btn = document.getElementById('btnManualSync');
+      const box = document.getElementById('syncStatusBox');
+      
+      btn.disabled = true;
+      box.classList.remove('hidden');
+      box.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> Mengambil data terbaru dari apemtipi.online...';
+
+      try {
+        const res = await fetch('/api/refresh', { method: 'POST' });
+        const data = await res.json();
+        if (data.success) {
+          box.innerHTML = `<span class="text-green-400 font-bold"><i class="fa-solid fa-check mr-2"></i>${data.message} (${data.totalMatches} pertandingan aktif).</span>`;
+        } else {
+          throw new Error(data.error);
+        }
+      } catch (err) {
+        box.innerHTML = `<span class="text-red-400 font-bold"><i class="fa-solid fa-xmark mr-2"></i>Gagal sinkron: ${err.message}</span>`;
+      } finally {
+        btn.disabled = false;
+      }
+    });
+
+    // Add custom match
+    document.getElementById('addMatchForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const payload = {
+        title: document.getElementById('matchTitleInput').value.trim(),
+        category: document.getElementById('matchCategoryInput').value.trim() || 'CUSTOM LIVE',
+        sport: document.getElementById('matchSportInput').value,
+        streamType: document.getElementById('streamTypeInput').value,
+        streamUrl: document.getElementById('streamUrlInput').value.trim(),
+        poster: document.getElementById('posterUrlInput').value.trim(),
+        isLive: document.getElementById('isLiveCheckbox').checked,
+        start: new Date().toISOString()
+      };
+
+      try {
+        const res = await fetch('/api/custom-match', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (data.success) {
+          alert(`Pertandingan "${data.match.title}" berhasil ditambahkan! ID: ${data.match.id}`);
+          window.location.href = `/watch?id=${encodeURIComponent(data.match.id)}`;
+        } else {
+          alert('Gagal: ' + data.error);
+        }
+      } catch (err) {
+        alert('Error: ' + err.message);
+      }
+    });
+
+    // Quick stream tester
+    let testHls = null;
+    function testQuickStream() {
+      const url = document.getElementById('quickTestUrl').value.trim();
+      const box = document.getElementById('testPlayerBox');
+      const video = document.getElementById('testVideo');
+
+      if (!url) return;
+      box.classList.remove('hidden');
+
+      if (testHls) {
+        testHls.destroy();
+        testHls = null;
+      }
+
+      if (url.includes('.m3u8') && Hls.isSupported()) {
+        testHls = new Hls();
+        testHls.loadSource(url);
+        testHls.attachMedia(video);
+        testHls.on(Hls.Events.MANIFEST_PARSED, () => video.play());
+      } else {
+        video.src = url;
+        video.play();
+      }
+    }
+  </script>
+</body>
+</html>
